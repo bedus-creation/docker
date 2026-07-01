@@ -38,6 +38,27 @@ services:
             start_period: 10s
         restart: unless-stopped
 
+    postgres:
+        image: pgvector/pgvector:pg18
+        container_name: local-postgres
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - local
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+        restart: unless-stopped
+
 networks:
     local:
         driver: bridge
@@ -45,3 +66,4 @@ networks:
 volumes:
     minio_data:
     redis_data:
+    postgres_data:
