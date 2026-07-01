@@ -39,7 +39,7 @@ services:
         restart: unless-stopped
 
     postgres:
-        image: pgvector/pgvector:pg17
+        image: pgvector/pgvector:pg18
         container_name: local-postgres
         ports:
             - "5432:5432"
