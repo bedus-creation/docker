@@ -1,0 +1,47 @@
+services:
+    minio:
+        image: quay.io/minio/minio
+        container_name: local-minio
+        ports:
+            - "9002:9000"
+            - "9001:9001"
+        environment:
+            MINIO_ROOT_USER: minio
+            MINIO_ROOT_PASSWORD: minio123
+        command: server /data --console-address ":9001"
+        volumes:
+            - minio_data:/data
+        networks:
+            - local
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+        restart: unless-stopped
+
+    redis:
+        image: redis:7-alpine
+        container_name: local-redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - local
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+        restart: unless-stopped
+
+networks:
+    local:
+        driver: bridge
+
+volumes:
+    minio_data:
+    redis_data:
