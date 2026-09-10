@@ -59,6 +59,32 @@ services:
             start_period: 10s
         restart: unless-stopped
 
+    opensearch:
+        image: opensearchproject/opensearch:latest
+        container_name: local-opensearch
+        ports:
+            - "9200:9200"
+            - "9600:9600"
+        environment:
+            discovery.type: single-node
+            DISABLE_INSTALL_DEMO_CONFIG: "true"
+            DISABLE_SECURITY_PLUGIN: "true"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - opensearch_data:/usr/share/opensearch/data
+        networks:
+            - local
+        healthcheck:
+            test: [ "CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null" ]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 30s
+        restart: unless-stopped
+
 networks:
     local:
         driver: bridge
@@ -67,3 +93,4 @@ volumes:
     minio_data:
     redis_data:
     postgres_data:
+    opensearch_data:
